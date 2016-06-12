@@ -82,21 +82,35 @@ def sorted?(arr)
   end
   true
 end
-streak = false
-reversed_streak = 0
-$arr_numbers.each_with_index do |val, index|
-  if $arr_numbers[index - 1] > val
-    reversed_streak += 1 if streak == true
-    if reversed_streak == 0
-      reversed_streak += 1
-      streak = true
+
+@reversed_streak = 0
+@streak = false
+
+def reversed?(val, index)
+  unless index == $arr_numbers.size - 1
+    # start reversed
+    if val > $arr_numbers[index + 1] && val > $arr_numbers[index -1] && @reversed_streak == 0
+      @reversed_streak += 1
+      @streak = true
+    end
+    # check streak is currently running
+    if val < $arr_numbers[index - 1] && val > $arr_numbers[index + 1] && @streak == true
+      @reversed_streak += 1
+    end
+    # check end streak
+    if val < $arr_numbers[index - 1] && val < $arr_numbers[index + 1] && @streak == true
+      @reversed_streak += 1
+      @streak = false
+      $reversed = true if @reversed_streak >= 3
     end
   end
-  if $arr_numbers[index-1] < val
-    streak = false
-    $reversed = true if reversed_streak >= 3
-    reversed_streak = 0
-  end
+end
+
+$arr_numbers.each_with_index do |val, index|
+  reversed?(val, index)
+end
+
+$arr_numbers.each_with_index do |val, index|
   if val > $arr_numbers[index - 1] && val > $arr_numbers[index + 1]
     $unsorted_index.push index
     min = $arr_numbers[index - 1]
@@ -104,8 +118,9 @@ $arr_numbers.each_with_index do |val, index|
     do_swap min..max
     break
   end
-
 end
+
+
 
 if $unsorted_index.empty?
   puts 'yes'
