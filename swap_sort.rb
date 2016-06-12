@@ -1,4 +1,5 @@
 $unsorted_index = []
+$reversed = false
 gets.to_i
 $arr_numbers = gets
 $arr_numbers = $arr_numbers.split(' ').map(&:to_i)
@@ -24,19 +25,19 @@ def reverse(reversed_index)
   arr
 end
 
-def do_swap
-  if $unsorted_index.size > 1
+def do_swap(range)
+  if $reversed == true
     do_reverse
     return
   end
-  i = 0
-  while $arr_numbers.size > i
-    if sorted? swap(i, $unsorted_index.first)
-      puts 'yes'
-      puts "swap #{i + 1} #{$unsorted_index.first + 1}"
-      return
+  $arr_numbers.each_with_index do |v,i|
+    if range.cover? v
+      if sorted? swap(i, $unsorted_index.first)
+        puts 'yes'
+        puts "swap #{$unsorted_index.first + 1} #{i+1}"
+        return
+      end
     end
-    i += 1
   end
   do_reverse
 end
@@ -81,16 +82,31 @@ def sorted?(arr)
   end
   true
 end
-
+streak = false
+reversed_streak = 0
 $arr_numbers.each_with_index do |val, index|
-  unless index == 0
-    $unsorted_index.push index if val < $arr_numbers[index - 1]
+  if $arr_numbers[index - 1] > val
+    reversed_streak += 1 if streak == true
+    if reversed_streak == 0
+      reversed_streak += 1
+      streak = true
+    end
   end
+  if $arr_numbers[index-1] < val
+    streak = false
+    $reversed = true if reversed_streak >= 3
+    reversed_streak = 0
+  end
+  if val > $arr_numbers[index - 1] && val > $arr_numbers[index + 1]
+    $unsorted_index.push index
+    min = $arr_numbers[index - 1]
+    max = $arr_numbers[index + 1]
+    do_swap min..max
+    break
+  end
+
 end
 
 if $unsorted_index.empty?
   puts 'yes'
-else
-  do_swap
 end
-
